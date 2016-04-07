@@ -174,18 +174,21 @@ class Match(object):
 
 class Runner(object):
 
-    def __init__(self, rules, playbook, tags, skip_list, exclude_paths):
+    def __init__(self, rules, playbook, tags, skip_list, exclude_paths,
+                 verbosity=0):
         self.rules = rules
         self.playbooks = set()
         # assume role if directory
         if os.path.isdir(playbook):
             self.playbooks.add((playbook, 'role'))
+            self.playbook_dir = playbook
         else:
             self.playbooks.add((playbook, 'playbook'))
-        self.playbook_dir = os.path.dirname(playbook)
+            self.playbook_dir = os.path.dirname(playbook)
         self.tags = tags
         self.skip_list = skip_list
         self._update_exclude_paths(exclude_paths)
+        self.verbosity = verbosity
 
     def _update_exclude_paths(self, exclude_paths):
         if exclude_paths:
@@ -224,6 +227,8 @@ class Runner(object):
 
         matches = list()
         for file in files:
+            if self.verbosity > 0:
+                print("Examining %s of type %s" % (file['path'], file['type']))
             matches.extend(self.rules.run(file, tags=set(self.tags),
                            skip_list=set(self.skip_list)))
 

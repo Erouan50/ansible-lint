@@ -66,6 +66,8 @@ def main(args):
                       help="only check rules whose id/tags match these values")
     parser.add_option('-T', dest='listtags', action='store_true',
                       help="list all the tags")
+    parser.add_option('-v', dest='verbosity', action='count',
+                      help="Increase verbosity level", default=0)
     parser.add_option('-x', dest='skip_list', default=[],
                       help="only check rules whose id/tags do not " +
                       "match these values")
@@ -110,7 +112,9 @@ def main(args):
     matches = list()
     for playbook in playbooks:
         runner = ansiblelint.Runner(rules, playbook, options.tags,
-                                    options.skip_list, options.exclude_paths)
+                                    options.skip_list, options.exclude_paths,
+                                    options.verbosity)
+
         matches.extend(runner.run())
 
     for match in matches:
